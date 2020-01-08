@@ -126,6 +126,7 @@ input {
 }
 /* dev image hover animation */
 #dev1:hover .front {
+  /* why is this one longer than all the others? */
   transition: 0.9s;
   transform: translateX(70px) 
     translateY(175px) scale(4);
