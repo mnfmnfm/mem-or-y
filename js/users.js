@@ -1,7 +1,8 @@
+'use strict';
 /**************************************************/
 /* Link this JS file before all other JS files!!! */
 /**************************************************/
-'use strict';
+// this comment is great! but 'use strict'; has to be the absolute first line, above comments.
 
 // Declare array to store all User instances.
 var allUsers = [];
@@ -17,7 +18,6 @@ function User(userName = '', loggedIn = false, allScores = []) {
 // Declare function to log in User.
 function logInUser(loginForm) {
   var userNameValue = document.getElementById('user-name').value;
-  var falseUsers = 0;
 
   if (userNameValue === '') {
     alert('Please enter a Username!');
@@ -25,17 +25,24 @@ function logInUser(loginForm) {
     if (allUsers.length === 0) {
       new User(userNameValue, true);
     } else {
-      for (let i = 0; i < allUsers.length; i++) {
-        if (allUsers[i].userName === userNameValue) {
-          allUsers[i].loggedIn = true;
-          break;
-        } else if (allUsers[i].userName !== userNameValue) {
-          falseUsers++;
-        }
-      }
-      if (falseUsers === allUsers.length) {
+      // let's make this a little smoother...
+      var currentUser = allUsers.find(x => x.userName === userNameValue);
+      if(currentUser) {
+        currentUser.loggedIn = true;
+      } else {
         new User(userNameValue, true);
       }
+      // for (let i = 0; i < allUsers.length; i++) {
+      //   if (allUsers[i].userName === userNameValue) {
+      //     allUsers[i].loggedIn = true;
+      //     break;
+      //   } else if (allUsers[i].userName !== userNameValue) {
+      //     falseUsers++;
+      //   }
+      // }
+      // if (falseUsers === allUsers.length) {
+      //   new User(userNameValue, true);
+      // }
     }
 
     loginForm.reset();
@@ -46,15 +53,10 @@ function logInUser(loginForm) {
 
 // Declare function to display logged in User.
 function displayUser() {
-  var loggedInUser = '';
-  for (let i = 0; i < allUsers.length; i++) {
-    if (allUsers[i].loggedIn === true) {
-      loggedInUser = allUsers[i].userName;
-      document.getElementById('logged-in-user').textContent = loggedInUser;
-      break;
-    }
+  var loggedInUser = allUsers.find(x => x.loggedIn);
+  if (loggedInUser) {
+    document.getElementById('logged-in-user').textContent = loggedInUser.userName;
   }
-
   document.getElementById('login-form').classList.toggle('hidden');
   document.getElementById('logout-form').classList.toggle('hidden');
 }
@@ -62,10 +64,7 @@ function displayUser() {
 // Declare function to log out User.
 function logOutUser() {
   for (let i = 0; i < allUsers.length; i++) {
-    if (allUsers[i].loggedIn === true) {
-      allUsers[i].loggedIn = false;
-      break;
-    }
+    allUsers[i].loggedIn = false;
   }
   localStorage.setItem('users', JSON.stringify(allUsers));
   document.getElementById('login-form').classList.toggle('hidden');

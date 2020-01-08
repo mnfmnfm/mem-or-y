@@ -67,6 +67,7 @@ function performSequence() {
   for (let i = 0; i < cards.length; i++) {
     cards[i].classList.remove('cyan');
   }
+  // this is lovely.
   for (let i = 0; i < cardSequence.length; i++) {
     let timer = i;
     let cardIndex = cardSequence[i];
@@ -90,11 +91,12 @@ var clickedCards = [];
 // Compare the clicked element to the corresponding sequence element.
 function clickCompare(event) {
   clickedCards.push(parseInt(event.target.id));
-  let cardID = document.getElementById(event.target.id);
+  // Getting an element by the id of an element you already have... You could just use event.target instead!
+  // let cardID = document.getElementById(event.target.id);
   if (clickedCards[clickCount] === cardSequence[clickCount]) {
-    cardID.classList.add('cyan');
+    event.target.classList.add('cyan');
     setTimeout(function() {
-      cardID.classList.remove('cyan');
+      event.target.classList.remove('cyan');
     }, 500);
     clickCount++;
   } else {
@@ -104,6 +106,13 @@ function clickCompare(event) {
     }
     failResult();
   }
+  // It's a little weird that you prevent this from happening on failure only by not incrementing the clickCount. I'd prefer that you structure your code more like:
+  // if (lose)
+  //   do the losing thing
+  // else if (at end of sequence)
+  //   do the end of sequence thing
+  // else
+  //   continue waiting for the next clicks in the sequence
   if (clickCount === cardSequence.length) {
     roundCount++;
     removeCardClicks();
@@ -170,6 +179,7 @@ function playAgain() {
 /* Functions & Data Related To Event Listeners */
 /***********************************************/
 
+// This is a pretty smooth way of doing the right thing on reload. Nice.
 // Declare event listener on page load.
 window.addEventListener('load', playAgain);
 
@@ -177,9 +187,13 @@ window.addEventListener('load', playAgain);
 document.getElementById('game-btn').addEventListener('click', toggleGame);
 
 // Declare event listener for the START button to begin the game.
-document.getElementById('game-start').addEventListener('click', function() {
+// All of these .getElementById calls take a bit of time. For the elements you're using repeatedly,
+// it's more efficient to create a variable to hold the element. For example...
+
+var gameStartElement = document.getElementById('game-start');
+gameStartElement.addEventListener('click', function() {
   initSequence();
-  document.getElementById('game-start').classList.add('hidden');
+  gameStartElement.classList.add('hidden');
   document.getElementById('card-container').style.paddingTop = '5.6rem';
 });
 
@@ -197,14 +211,8 @@ document.getElementById('play-again').addEventListener('click', function() {
 
 // Declare functions for Card event handlers.
 function cursorMouse(event) {
+  // You don't need to set this cursor style only onMouseOver... You could set this as the cursor style on game start, and set it to default on game end.
   event.target.style.cursor = 'pointer';
-}
-
-function defaultMouse(event) {
-  event.target.style.cursor = 'default';
-}
-
-function yellowMouse(event) {
   event.target.classList.add('darkgoldenrod');
 }
 
@@ -218,11 +226,10 @@ function clickMouse(event) {
 
 // Add event listeners to each Card element.
 function addCardClicks() {
+  // If you're adding both cursorMouse and yellowMouse for the same events,
+  // you can consolidate them into a single function.
   cards.forEach(function(card) {
     card.addEventListener('mouseenter', cursorMouse);
-  });
-  cards.forEach(function(card) {
-    card.addEventListener('mouseenter', yellowMouse);
   });
   cards.forEach(function(card) {
     card.addEventListener('mouseleave', blueMouse);
@@ -237,12 +244,7 @@ function removeCardClicks() {
   cards.forEach(function(card) {
     card.removeEventListener('mouseenter', cursorMouse);
   });
-  cards.forEach(function(card) {
-    card.addEventListener('mouseenter', defaultMouse);
-  });
-  cards.forEach(function(card) {
-    card.removeEventListener('mouseenter', yellowMouse);
-  });
+  // You shouldn't need to explicitly set the default
   cards.forEach(function(card) {
     card.removeEventListener('mouseleave', blueMouse);
   });

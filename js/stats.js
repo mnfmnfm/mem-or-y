@@ -1,16 +1,11 @@
 'use strict';
+/* global User */
 // retrieve user info from local storage
 var users = JSON.parse(localStorage.getItem('users'));
 // Declare a user profile array to fill
 var allUsers = [];
 // Declare constructor for user instances
-function User(userName, loggedIn, allScores) {
-  this.userName = userName;
-  this.loggedIn = loggedIn;
-  this.allScores = allScores;
-  this.highScore = Math.max(...this.allScores);
-  allUsers.push(this);
-}
+// We shouldn't need to declare the User constructor if we're using the users.js file, right?
 // function that returns array containing property of objects for current user
 function currentUser(property) {
   var answer = '';
@@ -36,9 +31,14 @@ for (var i = 0; i < users.length; i++) {
 }
 leaderBoard();
 // finds which user is current user and displays name and high score
+// you grab these by ClassName every time through this loop??
+// that's excessive!
+// Grab these outside the loop.
+var userNameEl = document.getElementsByClassName('user-name');
+var userScoreEl = document.getElementsByClassName('score');
+userNameEl[0].textContent = 'None';
+userScoreEl[0].textContent = 'None';
 for (i = 0; i < allUsers.length; i ++) {
-  var userNameEl = document.getElementsByClassName('user-name');
-  var userScoreEl = document.getElementsByClassName('score');
   if (allUsers[i].loggedIn === true) {
     userNameEl[0].textContent = allUsers[i].userName;
     if (allUsers[i].highScore > 0) {
@@ -48,8 +48,8 @@ for (i = 0; i < allUsers.length; i ++) {
     }
     break;
   } else {
-    userNameEl[0].textContent = 'None';
-    userScoreEl[0].textContent = 'None';
+    // You really just want this to be the default text content, and only overwrite it if necessary.
+    // So you don't even need the else block.
   }
 }
 // Assigns a variable to the table
@@ -68,9 +68,10 @@ function firstRow() {
   userRow.appendChild(userData);
   tableHolder.appendChild(userRow);
 }
-// vairable that shows rank on leaderboard
+// variable that shows rank on leaderboard
 var place = 1;
 // Creates a method that renders the table
+// I'd prefer to declare this in the users.js file, since it's about the User constructor.
 User.prototype.render = function() {
   var userRow = document.createElement('tr');
   var userData = document.createElement('td');
@@ -78,7 +79,8 @@ User.prototype.render = function() {
   userRow.appendChild(userData);
   place++;
   userData = document.createElement('td');
-  userData.textContent = `${this.userName}`;
+  // You don't have to use a template literal when you already have a string.
+  userData.textContent = this.userName;
   userRow.appendChild(userData);
   userData = document.createElement('td');
   userData.textContent = `${this.highScore}`;
@@ -155,6 +157,7 @@ var dataSets = [{
   fill: false,
   borderColor: 'rgb(78, 183, 248)'
 }];
+// niiice
 // removes current user dataset if current user has no score history
 if (currentUser('allScores') === undefined) {
   dataSets.splice(1,1);
@@ -196,5 +199,5 @@ var myChart = new Chart(ctx, {
         fontColor: 'black'
       }
     }
-}
+  }
 });
